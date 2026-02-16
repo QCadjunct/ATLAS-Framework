@@ -1,0 +1,61 @@
+{
+  "name": "analyze_claims",
+  "description": "Analyze and validate claims in a knowledge graph",
+  "prompt_template": "Validate the following knowledge graph nodes and relationships for accuracy, consistency, and completeness. Identify any issues, contradictions, or missing information.\n\nNodes: {nodes}\nRelationships: {relationships}\n\nFor each node and relationship, determine:\n1. Validity (VALIDATED, NEEDS_REVIEW, REJECTED)\n2. Confidence score (0.0-1.0)\n3. Issues or concerns\n4. Suggested improvements\n\nProvide a comprehensive validation report.",
+  "required_args": ["nodes", "relationships"],
+  "optional_args": {
+    "validation_threshold": 0.8,
+    "domain_expertise": "general"
+  },
+  "examples": [
+    {
+      "nodes": [
+        {
+          "id": "node1",
+          "labels": ["EnergyTerm", "RenewableSource"],
+          "properties": {
+            "name": "Solar energy",
+            "definition": "A renewable energy source that harnesses power from the sun",
+            "fuel_group": "renewable"
+          }
+        },
+        {
+          "id": "node2",
+          "labels": ["EnergyTerm", "RenewableSource"],
+          "properties": {
+            "name": "Wind energy",
+            "definition": "A renewable energy source that harnesses power from wind",
+            "fuel_group": "renewable"
+          }
+        }
+      ],
+      "relationships": [
+        {
+          "id": "rel1",
+          "type": "SIMILAR_TO",
+          "start_node_id": "node1",
+          "end_node_id": "node2",
+          "properties": {
+            "confidence": 0.9
+          }
+        }
+      ],
+      "output": {
+        "valid": true,
+        "node_statuses": {
+          "node1": "VALIDATED",
+          "node2": "VALIDATED"
+        },
+        "relationship_statuses": {
+          "rel1": "VALIDATED"
+        },
+        "issues": [],
+        "suggestions": [
+          "Add more specific properties to differentiate between solar and wind energy",
+          "Consider adding relationships to energy production methods"
+        ]
+      }
+    }
+  ]
+}
+

@@ -1,0 +1,63 @@
+The Developer’s Guide: How to Build a Knowledge Graph
+creating duplicates because the merges will find (such as web clickstream activity), which would
+the data that already exists. enable you to tie customers’ behavior to their
+purchases and use the knowledge graph to
+offer recommendations.
+Next Steps
+• Adding supply chain information for the
+products in the knowledge graph, which his
+Now that you have your initial version of a knowledge would enable you to use the knowledge graph
+graph, what can you do next? Remember that a to optimize the supply chain and mitigate the
+knowledge graph, especially one built on a graph risk of disruption.
+database with a flexible schema like Neo4j, can
+These ideas are, of course, just a starting point. You
+expand and grow to answer more questions and
+can follow the process outlined in this guide to come
+serve more business needs. Here are a few ideas for
+up with your own ideas.
+expanding the utility of your knowledge graph:
+• Expand your knowledge graph with additional
+Load Unstructured Data
+data sources
+One of the things that a knowledge graph built
+• Load unstructured data
+with the Neo4j graph database can do is combine
+• Enrich the knowledge graph using
+structured and unstructured or semi-structured
+graph algorithms
+data in a single knowledge graph. Integrating these
+Rather than walk through each of these approaches types of data enables you to answer questions that
+step by step, this guide will provide you with some wouldn’t otherwise be possible. GenAI use cases, in
+suggestions for how you can explore the next steps particular, can benefit from this capability by using
+on your own. vector embeddings and similarity searches to apply
+GraphRAG techniques for building applications that
+Expand Your Knowledge Graph With
+enable end users to interact with and ask questions
+Unstructured Data
+of the knowledge graph using plain language.
+You’ve built a knowledge graph with customer,
+product, and order information, with product You can use Neo4j’s LLM Knowledge Graph Builder
+categories as an organizing principle. You can to load unstructured data (such as PDFs) into your
+broaden the types of questions the knowledge graph existing knowledge graph. To experiment with this
+can answer by widening the scope of data it contains approach, you can use the sample PDF invoices from
+or by adding more organizing principles. You can the Northwind order purchases to get started. The
+load the data using the graphical data importer you tool uses an LLM to extract nodes and relationships
+already learned about or explore other approaches. from unstructured content and bridge the
+At the time of this guide’s publication, AuraDB’s data unstructured data (with vector representations) and
+importer can also connect directly to PostgreSQL, structured data in a single knowledge graph.
+MySQL, and SQL Server databases, so you could load
+If you want to use the LLM Knowledge Graph
+structured data directly from a relational database.
+Builder with an existing knowledge graph, you can
+Some ideas for other types of data and organizing
+take a couple of steps to help the Builder integrate
+principles include:
+with your existing graph. First, the Builder uses a
+• Adding an organizing principle for the specific label Entity (with two underscores each at
+customers to help you answer questions about the beginning and end) and property *id* to merge
+different customer segments. You could include information into an existing graph; you can set this
+location, industry, revenue, or other principles label and property by running the following Cypher:
+depending on the types of questions being
+asked by the business.
+• Loading additional data about your customers
+16

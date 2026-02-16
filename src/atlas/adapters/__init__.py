@@ -1,0 +1,3 @@
+"""
+ATLAS Framework - adapters module.
+"""

@@ -1,0 +1,67 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+# Common resources for all environments
+resources:
+  - namespace.yaml
+  - serviceaccount.yaml
+  - configmap.yaml
+  - secret.yaml
+  - deployment.yaml
+  - service.yaml
+  - ingress.yaml
+  - hpa.yaml
+  - pdb.yaml
+  - networkpolicy.yaml
+
+# Common labels for all resources
+commonLabels:
+  app.kubernetes.io/name: atlas-framework
+  app.kubernetes.io/part-of: atlas-platform
+  app.kubernetes.io/managed-by: kustomize
+
+# Common annotations for all resources
+commonAnnotations:
+  app.kubernetes.io/description: "ATLAS Framework - Agentic Taxonomy Learning and Synthesis"
+  app.kubernetes.io/documentation: "https://atlas-framework.github.io/atlas/"
+  app.kubernetes.io/repository: "https://github.com/atlas-framework/atlas"
+
+# Configuration for the ConfigMap generator
+configMapGenerator:
+  - name: atlas-config
+    files:
+      - atlas.json=config/atlas.json
+    options:
+      disableNameSuffixHash: false
+
+# Configuration for the Secret generator
+secretGenerator:
+  - name: atlas-secrets
+    envs:
+      - config/secrets.env
+    options:
+      disableNameSuffixHash: true
+
+# Namespace to deploy resources into
+namespace: atlas-system
+
+# Images to use
+images:
+  - name: atlas-framework
+    newName: ghcr.io/atlas-framework/atlas
+    newTag: latest
+
+# Patches to apply to resources
+patchesStrategicMerge:
+  - patches/deployment-resources.yaml
+  - patches/service-annotations.yaml
+
+# JSON patches to apply
+patchesJson6902:
+  - target:
+      group: apps
+      version: v1
+      kind: Deployment
+      name: atlas-api
+    path: patches/deployment-patch.yaml
+

@@ -1,0 +1,77 @@
+{
+  "name": "extract_wisdom",
+  "description": "Extract knowledge and insights from text",
+  "prompt_template": "Extract key concepts, terms, and their relationships from the following text. Focus on the {domain} domain.\n\nText: {text}\n\nExtract:\n1. Key terms and their definitions\n2. Relationships between terms\n3. Hierarchical structures\n4. Domain-specific properties\n\nFormat your response as structured knowledge that can be converted to a knowledge graph.",
+  "required_args": ["text", "domain"],
+  "optional_args": {
+    "max_terms": 50,
+    "min_confidence": 0.7
+  },
+  "examples": [
+    {
+      "text": "Solar energy is a renewable energy source that harnesses power from the sun. Photovoltaic cells convert sunlight directly into electricity, while solar thermal systems use the sun's heat for various applications like water heating or power generation.",
+      "domain": "energy",
+      "output": {
+        "nodes": [
+          {
+            "labels": ["EnergyTerm", "RenewableSource"],
+            "properties": {
+              "name": "Solar energy",
+              "definition": "A renewable energy source that harnesses power from the sun",
+              "fuel_group": "renewable"
+            }
+          },
+          {
+            "labels": ["TechnicalConcept"],
+            "properties": {
+              "name": "Photovoltaic cells",
+              "definition": "Devices that convert sunlight directly into electricity",
+              "domain": "energy",
+              "complexity": "medium"
+            }
+          },
+          {
+            "labels": ["TechnicalConcept"],
+            "properties": {
+              "name": "Solar thermal systems",
+              "definition": "Systems that use the sun's heat for various applications",
+              "domain": "energy",
+              "complexity": "medium"
+            }
+          }
+        ],
+        "relationships": [
+          {
+            "type": "IS_A",
+            "start_node_id": "Solar energy",
+            "end_node_id": "Renewable energy source",
+            "properties": {
+              "confidence": 0.95
+            }
+          },
+          {
+            "type": "USES",
+            "start_node_id": "Photovoltaic cells",
+            "end_node_id": "Solar energy",
+            "properties": {
+              "confidence": 0.9,
+              "quantity": "direct",
+              "unit": "conversion"
+            }
+          },
+          {
+            "type": "USES",
+            "start_node_id": "Solar thermal systems",
+            "end_node_id": "Solar energy",
+            "properties": {
+              "confidence": 0.9,
+              "quantity": "heat",
+              "unit": "application"
+            }
+          }
+        ]
+      }
+    }
+  ]
+}
+

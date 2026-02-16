@@ -1,0 +1,307 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: atlas-api
+  labels:
+    app: atlas-api
+    component: api
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: atlas-api
+      component: api
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 0
+  template:
+    metadata:
+      labels:
+        app: atlas-api
+        component: api
+      annotations:
+        prometheus.io/scrape: "true"
+        prometheus.io/port: "8001"
+        prometheus.io/path: "/metrics"
+    spec:
+      serviceAccountName: atlas-service-account
+      securityContext:
+        runAsUser: 1000
+        runAsGroup: 1000
+        fsGroup: 1000
+      containers:
+        - name: atlas-api
+          image: atlas-framework
+          imagePullPolicy: Always
+          ports:
+            - name: http
+              containerPort: 8000
+              protocol: TCP
+            - name: metrics
+              containerPort: 8001
+              protocol: TCP
+          env:
+            - name: ATLAS_ENV
+              valueFrom:
+                configMapKeyRef:
+                  name: atlas-config
+                  key: ATLAS_ENV
+            - name: ATLAS_LOG_LEVEL
+              valueFrom:
+                configMapKeyRef:
+                  name: atlas-config
+                  key: ATLAS_LOG_LEVEL
+            - name: ATLAS_CONFIG_PATH
+              value: "/app/config/atlas.json"
+            - name: ATLAS_SERVICE_NAME
+              value: "api"
+            - name: ATLAS_SERVICE_PORT
+              value: "8000"
+            - name: NEO4J_URI
+              valueFrom:
+                secretKeyRef:
+                  name: atlas-secrets
+                  key: NEO4J_URI
+            - name: NEO4J_USER
+              valueFrom:
+                secretKeyRef:
+                  name: atlas-secrets
+                  key: NEO4J_USER
+            - name: NEO4J_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: atlas-secrets
+                  key: NEO4J_PASSWORD
+            - name: REDIS_URL
+              valueFrom:
+                secretKeyRef:
+                  name: atlas-secrets
+                  key: REDIS_URL
+            - name: OPENAI_API_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: atlas-secrets
+                  key: OPENAI_API_KEY
+                  optional: true
+            - name: JWT_SECRET_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: atlas-secrets
+                  key: JWT_SECRET_KEY
+          resources:
+            requests:
+              cpu: 100m
+              memory: 256Mi
+            limits:
+              cpu: 500m
+              memory: 512Mi
+          volumeMounts:
+            - name: config-volume
+              mountPath: /app/config
+              readOnly: true
+            - name: data-volume
+              mountPath: /app/data
+            - name: logs-volume
+              mountPath: /app/logs
+            - name: cache-volume
+              mountPath: /app/cache
+          livenessProbe:
+            httpGet:
+              path: /health/live
+              port: metrics
+            initialDelaySeconds: 30
+            periodSeconds: 10
+            timeoutSeconds: 5
+            failureThreshold: 3
+          readinessProbe:
+            httpGet:
+              path: /health/ready
+              port: metrics
+            initialDelaySeconds: 10
+            periodSeconds: 5
+            timeoutSeconds: 3
+            failureThreshold: 2
+          startupProbe:
+            httpGet:
+              path: /health/startup
+              port: metrics
+            initialDelaySeconds: 5
+            periodSeconds: 5
+            timeoutSeconds: 3
+            failureThreshold: 12
+      volumes:
+        - name: config-volume
+          configMap:
+            name: atlas-config
+        - name: data-volume
+          persistentVolumeClaim:
+            claimName: atlas-data-pvc
+        - name: logs-volume
+          emptyDir: {}
+        - name: cache-volume
+          emptyDir: {}
+      affinity:
+        podAntiAffinity:
+          preferredDuringSchedulingIgnoredDuringExecution:
+            - weight: 100
+              podAffinityTerm:
+                labelSelector:
+                  matchExpressions:
+                    - key: app
+                      operator: In
+                      values:
+                        - atlas-api
+                topologyKey: kubernetes.io/hostname
+      terminationGracePeriodSeconds: 60
+      nodeSelector:
+        kubernetes.io/os: linux
+
+---
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: atlas-worker
+  labels:
+    app: atlas-worker
+    component: worker
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: atlas-worker
+      component: worker
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 0
+  template:
+    metadata:
+      labels:
+        app: atlas-worker
+        component: worker
+      annotations:
+        prometheus.io/scrape: "true"
+        prometheus.io/port: "8001"
+        prometheus.io/path: "/metrics"
+    spec:
+      serviceAccountName: atlas-service-account
+      securityContext:
+        runAsUser: 1000
+        runAsGroup: 1000
+        fsGroup: 1000
+      containers:
+        - name: atlas-worker
+          image: atlas-framework
+          imagePullPolicy: Always
+          command: ["/app/scripts/start-worker.sh"]
+          ports:
+            - name: metrics
+              containerPort: 8001
+              protocol: TCP
+          env:
+            - name: ATLAS_ENV
+              valueFrom:
+                configMapKeyRef:
+                  name: atlas-config
+                  key: ATLAS_ENV
+            - name: ATLAS_LOG_LEVEL
+              valueFrom:
+                configMapKeyRef:
+                  name: atlas-config
+                  key: ATLAS_LOG_LEVEL
+            - name: ATLAS_CONFIG_PATH
+              value: "/app/config/atlas.json"
+            - name: ATLAS_SERVICE_NAME
+              value: "worker"
+            - name: ATLAS_WORKER_CONCURRENCY
+              value: "4"
+            - name: NEO4J_URI
+              valueFrom:
+                secretKeyRef:
+                  name: atlas-secrets
+                  key: NEO4J_URI
+            - name: NEO4J_USER
+              valueFrom:
+                secretKeyRef:
+                  name: atlas-secrets
+                  key: NEO4J_USER
+            - name: NEO4J_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: atlas-secrets
+                  key: NEO4J_PASSWORD
+            - name: REDIS_URL
+              valueFrom:
+                secretKeyRef:
+                  name: atlas-secrets
+                  key: REDIS_URL
+            - name: OPENAI_API_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: atlas-secrets
+                  key: OPENAI_API_KEY
+                  optional: true
+          resources:
+            requests:
+              cpu: 200m
+              memory: 512Mi
+            limits:
+              cpu: 1000m
+              memory: 1Gi
+          volumeMounts:
+            - name: config-volume
+              mountPath: /app/config
+              readOnly: true
+            - name: data-volume
+              mountPath: /app/data
+            - name: logs-volume
+              mountPath: /app/logs
+            - name: cache-volume
+              mountPath: /app/cache
+          livenessProbe:
+            httpGet:
+              path: /health/live
+              port: metrics
+            initialDelaySeconds: 30
+            periodSeconds: 10
+            timeoutSeconds: 5
+            failureThreshold: 3
+          readinessProbe:
+            httpGet:
+              path: /health/ready
+              port: metrics
+            initialDelaySeconds: 10
+            periodSeconds: 5
+            timeoutSeconds: 3
+            failureThreshold: 2
+      volumes:
+        - name: config-volume
+          configMap:
+            name: atlas-config
+        - name: data-volume
+          persistentVolumeClaim:
+            claimName: atlas-data-pvc
+        - name: logs-volume
+          emptyDir: {}
+        - name: cache-volume
+          emptyDir: {}
+      affinity:
+        podAntiAffinity:
+          preferredDuringSchedulingIgnoredDuringExecution:
+            - weight: 100
+              podAffinityTerm:
+                labelSelector:
+                  matchExpressions:
+                    - key: app
+                      operator: In
+                      values:
+                        - atlas-worker
+                topologyKey: kubernetes.io/hostname
+      terminationGracePeriodSeconds: 60
+      nodeSelector:
+        kubernetes.io/os: linux
+

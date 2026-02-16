@@ -1,0 +1,78 @@
+site_name: ATLAS Framework
+site_description: Agentic Taxonomy Learning and Synthesis Framework
+site_author: ATLAS Framework Team
+site_url: https://atlas-framework.github.io
+
+theme:
+  name: material
+  custom_dir: overrides
+  logo: assets/images/atlas-logo.png
+  favicon: assets/images/favicon.svg
+  palette:
+    primary: custom
+  features:
+    - navigation.tabs
+    - navigation.sections
+    - navigation.expand
+    - navigation.path
+    - navigation.top
+    - search.highlight
+    - search.share
+    - content.code.copy
+    - content.code.annotate
+
+extra_css:
+  - assets/stylesheets/extra.css
+
+extra_javascript:
+  - assets/javascripts/extra.js
+  - https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.esm.min.mjs
+
+markdown_extensions:
+  - admonition
+  - attr_list
+  - def_list
+  - footnotes
+  - md_in_html
+  - toc:
+      permalink: true
+  - pymdownx.highlight:
+      anchor_linenums: true
+  - pymdownx.inlinehilite
+  - pymdownx.snippets
+  - pymdownx.superfences:
+      custom_fences:
+        - name: mermaid
+          class: mermaid
+          format: !!python/name:pymdownx.superfences.fence_code_format
+
+nav:
+  - Home: index.md
+  - Getting Started:
+    - Installation: getting-started/installation.md
+    - Quick Start: getting-started/quick-start.md
+  - Architecture:
+    - Overview: architecture/overview.md
+    - Design Principles: architecture/design-principles.md
+  - Features:
+    - Knowledge Graph: features/knowledge-graph.md
+    - Agentic LLMs: features/agentic-llms.md
+  - Examples:
+    - Basic Usage: examples/basic-usage.md
+    - Energy Taxonomy: examples/energy-taxonomy.md
+    - Interactive Demo: examples/interactive-demo.md
+
+plugins:
+  - search
+
+extra:
+  social:
+    - icon: fontawesome/brands/github
+      link: https://github.com/atlas-framework
+    - icon: fontawesome/brands/twitter
+      link: https://twitter.com/atlas_framework
+    - icon: fontawesome/brands/linkedin
+      link: https://linkedin.com/company/atlas-framework
+
+copyright: Copyright &copy; 2025 ATLAS Framework Team
+

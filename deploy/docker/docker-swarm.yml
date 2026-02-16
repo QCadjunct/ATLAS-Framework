@@ -1,0 +1,120 @@
+version: '3.8'
+
+services:
+  # Neo4j Graph Database
+  neo4j:
+    image: neo4j:5.13.0
+    ports:
+      - "7474:7474"  # HTTP
+      - "7687:7687"  # Bolt
+    environment:
+      - NEO4J_AUTH=neo4j/atlaspassword
+      - NEO4J_dbms_memory_heap_max__size=2G
+      - NEO4J_dbms_memory_pagecache_size=1G
+    volumes:
+      - neo4j_data:/data
+      - neo4j_logs:/logs
+      - neo4j_import:/var/lib/neo4j/import
+    networks:
+      - atlas-network
+    deploy:
+      replicas: 1
+      placement:
+        constraints:
+          - node.role == manager
+      restart_policy:
+        condition: on-failure
+        delay: 5s
+        max_attempts: 3
+      resources:
+        limits:
+          cpus: '1'
+          memory: 4G
+    healthcheck:
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:7474"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # ATLAS API Service
+  atlas-api:
+    image: ${REGISTRY:-localhost}/atlas-api:${TAG:-latest}
+    ports:
+      - "8000:8000"
+    environment:
+      - ATLAS_GRAPH_URI=bolt://neo4j:7687
+      - ATLAS_GRAPH_USERNAME=neo4j
+      - ATLAS_GRAPH_PASSWORD=atlaspassword
+      - ATLAS_LLM_PROVIDER=openai
+      - ATLAS_LLM_MODEL=gpt-4-1106-preview
+      - ATLAS_FABRIC_PATTERNS_DIR=/app/fabric/patterns
+    networks:
+      - atlas-network
+    deploy:
+      replicas: 2
+      update_config:
+        parallelism: 1
+        delay: 10s
+        order: start-first
+      restart_policy:
+        condition: on-failure
+        delay: 5s
+        max_attempts: 3
+      resources:
+        limits:
+          cpus: '0.5'
+          memory: 1G
+    depends_on:
+      - neo4j
+
+  # ATLAS Worker Service
+  atlas-worker:
+    image: ${REGISTRY:-localhost}/atlas-worker:${TAG:-latest}
+    environment:
+      - ATLAS_GRAPH_URI=bolt://neo4j:7687
+      - ATLAS_GRAPH_USERNAME=neo4j
+      - ATLAS_GRAPH_PASSWORD=atlaspassword
+      - ATLAS_LLM_PROVIDER=openai
+      - ATLAS_LLM_MODEL=gpt-4-1106-preview
+      - ATLAS_FABRIC_PATTERNS_DIR=/app/fabric/patterns
+    networks:
+      - atlas-network
+    deploy:
+      replicas: 3
+      update_config:
+        parallelism: 1
+        delay: 10s
+      restart_policy:
+        condition: on-failure
+        delay: 5s
+        max_attempts: 3
+      resources:
+        limits:
+          cpus: '0.5'
+          memory: 1G
+    depends_on:
+      - neo4j
+
+  # Docker Swarm Visualizer
+  visualizer:
+    image: dockersamples/visualizer:latest
+    ports:
+      - "8080:8080"
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+    networks:
+      - atlas-network
+    deploy:
+      placement:
+        constraints: [node.role == manager]
+
+networks:
+  atlas-network:
+    driver: overlay
+    attachable: true
+
+volumes:
+  neo4j_data:
+  neo4j_logs:
+  neo4j_import:
+

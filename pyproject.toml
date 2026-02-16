@@ -1,0 +1,322 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "atlas-framework"
+version = "1.0.0"
+description = "ATLAS Framework - Agentic Taxonomy Learning and Synthesis"
+readme = "README.md"
+license = "MIT"
+authors = [
+    { name = "ATLAS Framework Team", email = "atlas@framework.dev" },
+]
+maintainers = [
+    { name = "ATLAS Framework Team", email = "atlas@framework.dev" },
+]
+keywords = [
+    "taxonomy",
+    "knowledge-graph", 
+    "ai",
+    "llm",
+    "agentic",
+    "neo4j",
+    "pydantic",
+    "langchain",
+    "fabric"
+]
+classifiers = [
+    "Development Status :: 5 - Production/Stable",
+    "Intended Audience :: Developers",
+    "Intended Audience :: Science/Research",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Topic :: Scientific/Engineering :: Artificial Intelligence",
+    "Topic :: Software Development :: Libraries :: Python Modules",
+    "Typing :: Typed",
+]
+requires-python = ">=3.11"
+dependencies = [
+    # Core dependencies
+    "pydantic>=2.5.0",
+    "pydantic-settings>=2.1.0",
+    "typing-extensions>=4.8.0",
+    
+    # Graph database
+    "neo4j>=5.15.0",
+    "py2neo>=2021.2.4",
+    
+    # LLM frameworks
+    "langchain>=0.1.0",
+    "langchain-openai>=0.0.5",
+    "langchain-community>=0.0.10",
+    "langgraph>=0.0.20",
+    "langsmith>=0.0.80",
+    
+    # Search and retrieval
+    "tavily-python>=0.3.0",
+    
+    # Web scraping and extraction
+    "beautifulsoup4>=4.12.0",
+    "requests>=2.31.0",
+    "aiohttp>=3.9.0",
+    
+    # Document processing
+    "pypdf>=3.17.0",
+    "python-docx>=1.1.0",
+    "openpyxl>=3.1.0",
+    
+    # Utilities
+    "click>=8.1.0",
+    "rich>=13.7.0",
+    "structlog>=23.2.0",
+    "tenacity>=8.2.0",
+    
+    # Async support
+    "asyncio>=3.4.3",
+    "aiofiles>=23.2.0",
+    
+    # Security
+    "cryptography>=41.0.0",
+    "python-jose[cryptography]>=3.3.0",
+    
+    # Configuration
+    "python-dotenv>=1.0.0",
+    "pyyaml>=6.0.1",
+    "toml>=0.10.2",
+]
+
+[project.optional-dependencies]
+dev = [
+    # Testing
+    "pytest>=7.4.0",
+    "pytest-asyncio>=0.21.0",
+    "pytest-cov>=4.1.0",
+    "pytest-mock>=3.12.0",
+    "pytest-xdist>=3.5.0",
+    "hypothesis>=6.92.0",
+    
+    # Code quality
+    "ruff>=0.1.8",
+    "mypy>=1.8.0",
+    "black>=23.12.0",
+    "isort>=5.13.0",
+    "pre-commit>=3.6.0",
+    
+    # Documentation
+    "mkdocs>=1.5.0",
+    "mkdocs-material>=9.5.0",
+    "mkdocstrings[python]>=0.24.0",
+    "mkdocs-mermaid2-plugin>=1.1.0",
+    
+    # Performance
+    "memory-profiler>=0.61.0",
+    "py-spy>=0.3.14",
+    
+    # Development utilities
+    "ipython>=8.18.0",
+    "jupyter>=1.0.0",
+    "notebook>=7.0.0",
+]
+
+docs = [
+    "mkdocs>=1.5.0",
+    "mkdocs-material>=9.5.0", 
+    "mkdocstrings[python]>=0.24.0",
+    "mkdocs-mermaid2-plugin>=1.1.0",
+]
+
+test = [
+    "pytest>=7.4.0",
+    "pytest-asyncio>=0.21.0",
+    "pytest-cov>=4.1.0",
+    "pytest-mock>=3.12.0",
+    "pytest-xdist>=3.5.0",
+    "hypothesis>=6.92.0",
+]
+
+security = [
+    "bandit>=1.7.5",
+    "safety>=2.3.0",
+    "semgrep>=1.52.0",
+]
+
+performance = [
+    "memory-profiler>=0.61.0",
+    "py-spy>=0.3.14",
+    "line-profiler>=4.1.0",
+]
+
+all = [
+    "atlas-framework[dev,docs,test,security,performance]"
+]
+
+[project.urls]
+Homepage = "https://github.com/atlas-framework/atlas"
+Documentation = "https://atlas-framework.readthedocs.io"
+Repository = "https://github.com/atlas-framework/atlas"
+"Bug Tracker" = "https://github.com/atlas-framework/atlas/issues"
+Changelog = "https://github.com/atlas-framework/atlas/blob/main/CHANGELOG.md"
+
+[project.scripts]
+atlas = "atlas.cli.main:main"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/atlas"]
+
+[tool.hatch.build.targets.sdist]
+include = [
+    "/src",
+    "/tests",
+    "/docs",
+    "/configs",
+    "/examples",
+    "/scripts",
+    "README.md",
+    "CHANGELOG.md",
+    "LICENSE",
+]
+
+# Ruff configuration
+[tool.ruff]
+target-version = "py311"
+line-length = 100
+select = [
+    "E",   # pycodestyle errors
+    "W",   # pycodestyle warnings
+    "F",   # pyflakes
+    "I",   # isort
+    "B",   # flake8-bugbear
+    "C4",  # flake8-comprehensions
+    "UP",  # pyupgrade
+    "ARG", # flake8-unused-arguments
+    "SIM", # flake8-simplify
+    "TCH", # flake8-type-checking
+    "TID", # flake8-tidy-imports
+    "Q",   # flake8-quotes
+    "FLY", # flynt
+    "PERF", # perflint
+    "RUF", # ruff-specific rules
+]
+ignore = [
+    "E501",  # line too long, handled by black
+    "B008",  # do not perform function calls in argument defaults
+    "C901",  # too complex
+    "W191",  # indentation contains tabs
+]
+
+[tool.ruff.per-file-ignores]
+"__init__.py" = ["F401"]  # Allow unused imports in __init__.py
+"tests/**/*" = ["ARG", "FBT"]  # Allow unused arguments and boolean traps in tests
+
+[tool.ruff.isort]
+known-first-party = ["atlas"]
+
+# MyPy configuration
+[tool.mypy]
+python_version = "3.11"
+warn_return_any = true
+warn_unused_configs = true
+disallow_untyped_defs = true
+disallow_incomplete_defs = true
+check_untyped_defs = true
+disallow_untyped_decorators = true
+no_implicit_optional = true
+warn_redundant_casts = true
+warn_unused_ignores = true
+warn_no_return = true
+warn_unreachable = true
+strict_equality = true
+show_error_codes = true
+
+[[tool.mypy.overrides]]
+module = [
+    "neo4j.*",
+    "py2neo.*",
+    "langchain.*",
+    "langgraph.*",
+    "langsmith.*",
+    "tavily.*",
+    "fabric.*",
+]
+ignore_missing_imports = true
+
+# Pytest configuration
+[tool.pytest.ini_options]
+minversion = "7.0"
+addopts = [
+    "--strict-markers",
+    "--strict-config",
+    "--cov=atlas",
+    "--cov-report=term-missing",
+    "--cov-report=html",
+    "--cov-report=xml",
+    "--cov-fail-under=85",
+]
+testpaths = ["tests"]
+python_files = ["test_*.py", "*_test.py"]
+python_classes = ["Test*"]
+python_functions = ["test_*"]
+markers = [
+    "slow: marks tests as slow (deselect with '-m \"not slow\"')",
+    "integration: marks tests as integration tests",
+    "unit: marks tests as unit tests",
+    "neo4j: marks tests that require Neo4j",
+    "llm: marks tests that require LLM access",
+    "network: marks tests that require network access",
+]
+
+# Coverage configuration
+[tool.coverage.run]
+source = ["src/atlas"]
+omit = [
+    "*/tests/*",
+    "*/test_*",
+    "*/__init__.py",
+    "*/cli/*",  # CLI scripts often hard to test
+]
+
+[tool.coverage.report]
+exclude_lines = [
+    "pragma: no cover",
+    "def __repr__",
+    "if self.debug:",
+    "if settings.DEBUG",
+    "raise AssertionError",
+    "raise NotImplementedError",
+    "if 0:",
+    "if __name__ == .__main__.:",
+    "class .*\\bProtocol\\):",
+    "@(abc\\.)?abstractmethod",
+]
+
+# Black configuration
+[tool.black]
+line-length = 100
+target-version = ['py311']
+include = '\.pyi?$'
+extend-exclude = '''
+/(
+  # directories
+  \.eggs
+  | \.git
+  | \.hg
+  | \.mypy_cache
+  | \.tox
+  | \.venv
+  | build
+  | dist
+)/
+'''
+
+# isort configuration
+[tool.isort]
+profile = "black"
+line_length = 100
+known_first_party = ["atlas"]
+skip_glob = ["*/__init__.py"]
+

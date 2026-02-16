@@ -1,0 +1,69 @@
+{
+  "name": "find_patterns",
+  "description": "Find patterns and relationships in data",
+  "prompt_template": "Analyze the following nodes and identify potential relationships between them. Focus on finding patterns, hierarchies, and semantic connections with a confidence level of at least {min_confidence}.\n\nNodes: {nodes}\n\nIdentify relationships of the following types:\n- IS_A/SUBCLASS_OF (hierarchical)\n- PART_OF/CONTAINS (compositional)\n- RELATED_TO (general association)\n- SIMILAR_TO (similarity)\n- OPPOSITE_OF (contrast)\n- USES/PRODUCES (functional)\n- REGULATES (control)\n- MEASURED_BY (metrics)\n\nFor each relationship, provide:\n1. Relationship type\n2. Source and target nodes\n3. Confidence score (0.0-1.0)\n4. Any relevant properties",
+  "required_args": ["nodes"],
+  "optional_args": {
+    "min_confidence": 0.7,
+    "max_relationships": 100
+  },
+  "examples": [
+    {
+      "nodes": [
+        {
+          "id": "node1",
+          "labels": ["EnergyTerm", "RenewableSource"],
+          "properties": {
+            "name": "Solar energy",
+            "definition": "A renewable energy source that harnesses power from the sun",
+            "fuel_group": "renewable"
+          }
+        },
+        {
+          "id": "node2",
+          "labels": ["EnergyTerm", "RenewableSource"],
+          "properties": {
+            "name": "Wind energy",
+            "definition": "A renewable energy source that harnesses power from wind",
+            "fuel_group": "renewable"
+          }
+        },
+        {
+          "id": "node3",
+          "labels": ["TechnicalConcept"],
+          "properties": {
+            "name": "Photovoltaic cells",
+            "definition": "Devices that convert sunlight directly into electricity",
+            "domain": "energy",
+            "complexity": "medium"
+          }
+        }
+      ],
+      "min_confidence": 0.7,
+      "output": {
+        "relationships": [
+          {
+            "type": "SIMILAR_TO",
+            "start_node_id": "node1",
+            "end_node_id": "node2",
+            "properties": {
+              "confidence": 0.9,
+              "reason": "Both are renewable energy sources"
+            }
+          },
+          {
+            "type": "USES",
+            "start_node_id": "node3",
+            "end_node_id": "node1",
+            "properties": {
+              "confidence": 0.85,
+              "quantity": "direct",
+              "unit": "conversion"
+            }
+          }
+        ]
+      }
+    }
+  ]
+}
+
